@@ -1,0 +1,6 @@
+ansicolors
+dpkt
+nose
+scapy==2.3.1
+tabulate
+thrift==0.9.2
