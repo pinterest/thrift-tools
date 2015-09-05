@@ -1,4 +1,4 @@
-# thrift-tools [![Build Status](https://travis-ci.org/pinterest/thrift-tools.svg?branch=master)](https://travis-ci.org/pinterest/thrift-tools) [![Coverage Status](https://coveralls.io/repos/pinterest/thrift-tools/badge.svg?branch=master&service=github)](https://coveralls.io/github/pinterest/thrift-tools?branch=master)
+# thrift-tools [![Build Status](https://travis-ci.org/pinterest/thrift-tools.svg?branch=master)](https://travis-ci.org/pinterest/thrift-tools) [![Coverage Status](https://coveralls.io/repos/pinterest/thrift-tools/badge.svg?branch=master&service=github)](https://coveralls.io/github/pinterest/thrift-tools?branch=master) [![PyPI version](https://badge.fury.io/py/thrift-tools.svg)](http://badge.fury.io/py/thrift-tools)
 
 
 **Table of Contents**
