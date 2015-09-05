@@ -1,4 +1,4 @@
-# thrift-tools [![Build Status](https://travis-ci.org/pinterest/thrift-tools.svg?branch=master)](https://travis-ci.org/pinterest/thrift-tools)
+# thrift-tools [![Build Status](https://travis-ci.org/pinterest/thrift-tools.svg?branch=master)](https://travis-ci.org/pinterest/thrift-tools) [![Coverage Status](https://coveralls.io/repos/pinterest/thrift-tools/badge.svg?branch=master&service=github)](https://coveralls.io/github/pinterest/thrift-tools?branch=master)
 
 
 **Table of Contents**
