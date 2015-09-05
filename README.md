@@ -1,4 +1,4 @@
-# thrift-tools
+# thrift-tools [![Build Status](https://travis-ci.org/pinterest/thrift-tools.svg?branch=master)](https://travis-ci.org/pinterest/thrift-tools)
 
 
 **Table of Contents**
