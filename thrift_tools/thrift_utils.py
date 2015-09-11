@@ -8,14 +8,15 @@ from thrift.protocol.TJSONProtocol import TJSONProtocol
 from thrift.protocol.TProtocol import TType
 from thrift.Thrift import TMessageType
 from thrift.transport import TTransport
+from thrift_tools.thrift_struct import ThriftField, ThriftStruct
 
 
 class ThriftMessage(object):
-    def __init__(self, method, mtype, seqid, fields, header=(), length=-1):
+    def __init__(self, method, mtype, seqid, args, header=(), length=-1):
         self._method = method
         self._type = mtype
         self._seqid = seqid
-        self._fields = fields
+        self._args = args
         self._header = header  # finagle-thrift prepends this to each call
         self._length = length
 
@@ -35,8 +36,8 @@ class ThriftMessage(object):
         return self._seqid
 
     @property
-    def fields(self):
-        return self._fields
+    def args(self):
+        return self._args
 
     @property
     def header(self):
@@ -44,7 +45,7 @@ class ThriftMessage(object):
 
     def __str__(self):
         return 'method=%s, type=%s, seqid=%s, header=%s, fields=%s' % (
-            self.method, self.type, self.seqid, self.header, str(self.fields))
+            self.method, self.type, self.seqid, self.header, str(self.args))
 
     @property
     def as_dict(self):
@@ -53,7 +54,7 @@ class ThriftMessage(object):
             'type': self.type,
             'seqid': self.seqid,
             'header': self.header,
-            'fields': self.fields,
+            'fields': self.args,
             'length': len(self),
             }
 
@@ -142,7 +143,7 @@ class ThriftMessage(object):
         #       as we read them (i.e.: when calling readI32, etc).
         msglen = trans._buffer.tell()
 
-        return cls(method, mtype, seqid, fields, header, msglen), msglen
+        return cls(method, mtype, seqid, ThriftStruct(fields), header, msglen), msglen
 
     @classmethod
     def detect_protocol(cls, data, default=None):
@@ -205,7 +206,7 @@ class ThriftMessage(object):
             if ftype == TType.STOP:
                 break
 
-            value = cls.readField(
+            value = cls.readFieldValue(
                 proto, ftype,
                 max_fields,
                 max_list_size,
@@ -215,12 +216,12 @@ class ThriftMessage(object):
 
             proto.readFieldEnd()
 
-            fields.append((cls.field_type_to_str(ftype), fid, value))
+            fields.append(ThriftField(cls.field_type_to_str(ftype), fid, value))
 
         return fields
 
     @classmethod
-    def readField(cls, proto, ftype,
+    def readFieldValue(cls, proto, ftype,
                   max_fields,
                   max_list_size,
                   max_map_size,
@@ -229,7 +230,7 @@ class ThriftMessage(object):
         value = None
 
         def _read(_type):
-            return cls.readField(
+            return cls.readFieldValue(
                 proto,
                 _type,
                 max_fields,
@@ -253,7 +254,7 @@ class ThriftMessage(object):
 
         if ftype == TType.STRUCT:
             proto.readStructBegin()
-            value = cls.readFields(
+            fields = cls.readFields(
                 proto,
                 max_fields,
                 max_list_size,
@@ -261,6 +262,7 @@ class ThriftMessage(object):
                 max_set_size,
                 read_values
                 )
+            value = ThriftStruct(fields)
             proto.readStructEnd()
         elif ftype == TType.I32:
             if read_values:

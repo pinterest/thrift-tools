@@ -50,7 +50,7 @@ def print_msg(timestamp, src, dst, msg, format_opts,
         header_line = ''
 
     if format_opts.show_fields:
-        fields_line = '%sfields: %s\n' % (indent, pretty(msg.fields))
+        fields_line = '%sfields: %s\n' % (indent, pretty(msg.args))
     else:
         fields_line = ''
 
@@ -68,7 +68,7 @@ def print_msg(timestamp, src, dst, msg, format_opts,
             parts['header'] = msg.header
 
         if format_opts.show_fields:
-            parts['fields'] = msg.fields
+            parts['fields'] = msg.args
 
         outputstr = json.dumps(parts, indent=4) + '\n'
     else:
