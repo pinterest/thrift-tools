@@ -12,7 +12,7 @@ try:
 except ImportError:
     HAS_MMAP = False
 
-from .thrift_utils import ThriftMessage
+from .thrift_message import ThriftMessage
 
 
 def get_flags():

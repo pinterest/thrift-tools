@@ -4,6 +4,7 @@ import unittest
 
 from thrift_tools.sniffer import Sniffer
 from thrift_tools.stream_handler import StreamHandler
+from thrift_tools.thrift_struct import ThriftField, ThriftStruct
 
 from .util import get_pcap_path
 
@@ -38,12 +39,12 @@ class BasicTestCase(unittest.TestCase):
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, '__can__finagle__trace__v3__')
         self.assertEquals(msg.type, 'call')
-        self.assertEquals(len(msg.fields), 0)
+        self.assertEquals(len(msg.args), 0)
 
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, '__can__finagle__trace__v3__')
         self.assertEquals(msg.type, 'reply')
-        self.assertEquals(len(msg.fields), 0)
+        self.assertEquals(len(msg.args), 0)
 
         # the search() call
         _, src, dst, msg = queue.popleft()
@@ -52,23 +53,23 @@ class BasicTestCase(unittest.TestCase):
 
         # inspect the header & the contexts
         self.assertEquals(len(msg.header), 4)
-        self.assertEquals(msg.header[0], ('i64', 1, -8277104800942727271))
-        self.assertEquals(msg.header[1], ('i64', 2, -8277104800942727271))
-        self.assertEquals(msg.header[2], ('i64', 7, 0))
+        self.assertEquals(msg.header[0], ThriftField('i64', 1, -8277104800942727271))
+        self.assertEquals(msg.header[1], ThriftField('i64', 2, -8277104800942727271))
+        self.assertEquals(msg.header[2], ThriftField('i64', 7, 0))
 
-        contexts = msg.header[3][2]
-        self.assertEquals(contexts[0][0][2],
+        contexts = msg.header[3].value
+        self.assertEquals(contexts[0][0].value,
                           'com.twitter.finagle.tracing.TraceContext')
-        self.assertEquals(contexts[1][0][2],
+        self.assertEquals(contexts[1][0].value,
                           'com.twitter.finagle.Deadline')
 
-        self.assertEquals(msg.fields, [('string', 1, 'foo')])
+        self.assertEquals(msg.args, ThriftStruct([ThriftField('string', 1, 'foo')]))
 
         # the reply
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'search')
         self.assertEquals(msg.type, 'reply')
-        self.assertEquals(msg.fields, [('list', 0, ['one', 'two', 'three'])])
+        self.assertEquals(msg.args, ThriftStruct([ThriftField('list', 0, ['one', 'two', 'three'])]))
 
     def _test_protocol(self, protoname):
         queue = deque()
@@ -84,71 +85,79 @@ class BasicTestCase(unittest.TestCase):
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'ping')
         self.assertEquals(msg.type, 'call')
-        self.assertEquals(len(msg.fields), 0)
+        self.assertEquals(len(msg.args), 0)
 
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'ping')
         self.assertEquals(msg.type, 'reply')
-        self.assertEquals(len(msg.fields), 0)
+        self.assertEquals(len(msg.args), 0)
 
         # a succesful add
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'add')
         self.assertEquals(msg.type, 'call')
-        self.assertEquals(len(msg.fields), 2)
-        self.assertEquals(msg.fields[0], ('i32', 1, 1))
-        self.assertEquals(msg.fields[1], ('i32', 2, 1))
+        self.assertEquals(len(msg.args), 2)
+        self.assertEquals(msg.args[0], ThriftField('i32', 1, 1))
+        self.assertEquals(msg.args[1], ThriftField('i32', 2, 1))
 
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'add')
         self.assertEquals(msg.type, 'reply')
-        self.assertEquals(len(msg.fields), 1)
-        self.assertEquals(msg.fields[0], ('i32', 0, 2))
+        self.assertEquals(len(msg.args), 1)
+        self.assertEquals(msg.args[0], ThriftField('i32', 0, 2))
 
         # a failed calculate call
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'calculate')
         self.assertEquals(msg.type, 'call')
-        self.assertEquals(len(msg.fields), 2)
-        self.assertEquals(msg.fields[0], ('i32', 1, 1))
+        self.assertEquals(len(msg.args), 2)
+        self.assertEquals(msg.args[0], ThriftField('i32', 1, 1))
         self.assertEquals(
-            msg.fields[1],
-            ('struct', 2, [('i32', 1, 1), ('i32', 2, 0), ('i32', 3, 4)]))
-
+            msg.args[1],
+            ThriftField('struct', 2,
+                        ThriftStruct(
+                            [ThriftField('i32', 1, 1),
+                             ThriftField('i32', 2, 0),
+                             ThriftField('i32', 3, 4)])))
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'calculate')
         self.assertEquals(msg.type, 'reply')
-        self.assertEquals(len(msg.fields), 1)
+        self.assertEquals(len(msg.args), 1)
         self.assertEquals(
-            msg.fields[0],
-            ('struct', 1, [('i32', 1, 4), ('string', 2, 'Cannot divide by 0')]))
+            msg.args[0],
+            ThriftField('struct', 1,
+                        ThriftStruct([ThriftField('i32', 1, 4),
+                                      ThriftField('string', 2, 'Cannot divide by 0')])))
 
         # a successful calculate call
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'calculate')
         self.assertEquals(msg.type, 'call')
-        self.assertEquals(len(msg.fields), 2)
+        self.assertEquals(len(msg.args), 2)
         self.assertEquals(
-            msg.fields[1],
-            ('struct', 2, [('i32', 1, 15), ('i32', 2, 10), ('i32', 3, 2)]))
+            msg.args[1],
+            ThriftField('struct', 2, ThriftStruct([ThriftField('i32', 1, 15),
+                                                   ThriftField('i32', 2, 10),
+                                                   ThriftField('i32', 3, 2)])))
 
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'calculate')
         self.assertEquals(msg.type, 'reply')
-        self.assertEquals(len(msg.fields), 1)
-        self.assertEquals(msg.fields[0], ('i32', 0, 5))
+        self.assertEquals(len(msg.args), 1)
+        self.assertEquals(msg.args[0], ThriftField('i32', 0, 5))
 
         # getStruct
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'getStruct')
         self.assertEquals(msg.type, 'call')
-        self.assertEquals(len(msg.fields), 1)
-        self.assertEquals(msg.fields[0], ('i32', 1, 1))
+        self.assertEquals(len(msg.args), 1)
+        self.assertEquals(msg.args[0], ThriftField('i32', 1, 1))
 
         _, src, dst, msg = queue.popleft()
         self.assertEquals(msg.method, 'getStruct')
         self.assertEquals(msg.type, 'reply')
-        self.assertEquals(len(msg.fields), 1)
+        self.assertEquals(len(msg.args), 1)
         self.assertEquals(
-            msg.fields[0],
-            ('struct', 0, [('i32', 1, 1), ('string', 2, '5')]))
+            msg.args[0],
+            ThriftField('struct', 0, ThriftStruct([ThriftField('i32', 1, 1),
+                                                   ThriftField('string', 2, '5')])))

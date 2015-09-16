@@ -7,7 +7,7 @@ from collections import defaultdict
 import sys
 import traceback
 
-from .thrift_utils import ThriftMessage
+from .thrift_message import ThriftMessage
 
 
 class StreamContext(object):
