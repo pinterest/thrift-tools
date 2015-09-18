@@ -15,6 +15,8 @@ class ThriftMessage(object):
         self._method = method
         self._type = mtype
         self._seqid = seqid
+        if not isinstance(args, ThriftStruct):
+            raise ValueError('args must be a ThriftStruct instance')
         self._args = args
         self._header = header  # finagle-thrift prepends this to each call
         self._length = length
@@ -53,7 +55,7 @@ class ThriftMessage(object):
             'type': self.type,
             'seqid': self.seqid,
             'header': self.header,
-            'fields': self.args,
+            'args': self.args,
             'length': len(self),
         }
 
@@ -96,7 +98,6 @@ class ThriftMessage(object):
         header = None
         if finagle_thrift:
             try:
-                proto.readStructBegin()
                 header = ThriftStruct.read(
                     proto,
                     max_fields,
@@ -104,7 +105,6 @@ class ThriftMessage(object):
                     max_map_size,
                     max_set_size,
                     read_values)
-                proto.readStructEnd()
             except:
                 # reset stream, maybe it's not finagle-thrift
                 trans = TTransport.TMemoryBuffer(data)
@@ -126,7 +126,6 @@ class ThriftMessage(object):
         if any(ord(char) not in valid for char in method):
             raise ValueError('invalid method name' % method)
 
-        proto.readStructBegin()
         args = ThriftStruct.read(
             proto,
             max_fields,
@@ -134,7 +133,7 @@ class ThriftMessage(object):
             max_map_size,
             max_set_size,
             read_values)
-        proto.readStructEnd()
+
         proto.readMessageEnd()
 
         # Note: this is a bit fragile, the right thing would be to count bytes

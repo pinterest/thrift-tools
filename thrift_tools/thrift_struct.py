@@ -36,8 +36,8 @@ class ThriftStruct(object):
     def __iter__(self):
         return iter(self._fields)
 
-    def __str__(self):
-        return str(self._fields)
+    def __repr__(self):
+        return "fields=%s" % self.fields
 
     class ObjectTooBig(Exception):
         pass
@@ -52,6 +52,7 @@ class ThriftStruct(object):
              read_values=False):
         fields = []
         nfields = 0
+        proto.readStructBegin()
         while True:
             nfields += 1
             if nfields >= max_fields:
@@ -72,7 +73,7 @@ class ThriftStruct(object):
             proto.readFieldEnd()
 
             fields.append(ThriftField(cls.field_type_to_str(ftype), fid, value))
-
+        proto.readStructEnd()
         return cls(fields)
 
     @classmethod
@@ -108,7 +109,6 @@ class ThriftStruct(object):
         #        the transport seek() to that point.
 
         if ftype == TType.STRUCT:
-            proto.readStructBegin()
             value = cls.read(
                 proto,
                 max_fields,
@@ -117,7 +117,6 @@ class ThriftStruct(object):
                 max_set_size,
                 read_values
             )
-            proto.readStructEnd()
         elif ftype == TType.I32:
             if read_values:
                 value = proto.readI32()
@@ -232,8 +231,8 @@ class ThriftField(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def __str__(self):
-        return 'field_type=%s, field_id=%s, value=%s' % (
+    def __repr__(self):
+        return '(%s, %s, %s)' % (
             self.field_type, self.field_id, self._value)
 
     def is_isomorphic_to(self, other):
