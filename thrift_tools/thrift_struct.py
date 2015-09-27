@@ -1,6 +1,14 @@
 from thrift.Thrift import TType
 
 
+class Error(Exception):
+    pass
+
+
+class ObjectTooBig(Error):
+    pass
+
+
 class ThriftStruct(object):
     """A thrift struct"""
 
@@ -39,9 +47,6 @@ class ThriftStruct(object):
     def __repr__(self):
         return "fields=%s" % self.fields
 
-    class ObjectTooBig(Exception):
-        pass
-
     @classmethod
     def read(cls,
              proto,
@@ -56,7 +61,7 @@ class ThriftStruct(object):
         while True:
             nfields += 1
             if nfields >= max_fields:
-                raise cls.ObjectTooBig('too many fields: %d' % nfields)
+                raise ObjectTooBig('too many fields: %d' % nfields)
 
             _, ftype, fid = proto.readFieldBegin()
             if ftype == TType.STOP:
@@ -135,7 +140,7 @@ class ThriftStruct(object):
         elif ftype == TType.LIST:
             (etype, size) = proto.readListBegin()
             if size > max_list_size:
-                raise cls.ObjectTooBig('list too long: %d' % size)
+                raise ObjectTooBig('list too long: %d' % size)
             value = []
             if read_values:
                 value = [_read(etype) for _ in xrange(size)]
@@ -146,7 +151,7 @@ class ThriftStruct(object):
         elif ftype == TType.MAP:
             (ktype, vtype, size) = proto.readMapBegin()
             if size > max_map_size:
-                raise cls.ObjectTooBig('map too big: %d' % size)
+                raise ObjectTooBig('map too big: %d' % size)
             value = {}
             if read_values:
                 for i in xrange(size):
@@ -161,7 +166,7 @@ class ThriftStruct(object):
         elif ftype == TType.SET:
             (etype, size) = proto.readSetBegin()
             if size > max_set_size:
-                raise cls.ObjectTooBig('set too big: %d' % size)
+                raise ObjectTooBig('set too big: %d' % size)
             value = set()
             if read_values:
                 for i in xrange(size):
