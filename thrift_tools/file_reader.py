@@ -6,13 +6,7 @@ import argparse
 import pprint
 import sys
 
-try:
-    import mmap
-    HAS_MMAP = True
-except ImportError:
-    HAS_MMAP = False
-
-from .thrift_message import ThriftMessage
+from thrift_tools.thrift_file import ThriftMessageFile, ThriftFile
 
 
 def get_flags():
@@ -45,68 +39,31 @@ def get_flags():
 
 def main():
     flags = get_flags()
-
-    if flags.file == '-':
-        fh = sys.stdin
-    else:
-        try:
-            fh = open(flags.file)
-        except IOError as ex:
-            print('Couldn\'t open %s: %s' % (flags.file, ex))
-            sys.exit(1)
-
-    if HAS_MMAP and flags.file != '-':
-        data = mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ)
-        view = None
-    else:
-        # this might hurt...
-        data = fh.read()
-        view = memoryview(data)
+    try :
+        thrift_msg_file = ThriftMessageFile(flags.file, flags.finagle_thrift,
+                                            not flags.skip_values, flags.padding)
+    except ThriftFile.Error as ex:
+        print(ex.message)
+        sys.exit(1)
 
     pp = pprint.PrettyPrinter(indent=4)
-
-    start = flags.padding
-    nread = 0
-
-    # each hole is a tuple of (start_position, nbytes)
     holes = []
-
+    total_msg_read = 0
     try:
-        done = False
-        while start < len(data) and not done:
-            for idx in range(start, len(data)):
-                try:
-                    msg, msglen = ThriftMessage.read(
-                        view[idx:].tobytes() if view else data[idx:],
-                        finagle_thrift=flags.finagle_thrift,
-                        read_values=not flags.skip_values)
-
-                    print(pp.pformat(msg.as_dict) if flags.pretty else msg)
-                    nread += 1
-
-                    # did we skip any bytes?
-                    nbytes = idx - start
-                    if nbytes > 0:
-                        holes.append((start, nbytes))
-
-                    start = idx + msglen + flags.padding
-
-                    if flags.max_messages > 0 and nread > flags.max_messages:
-                        done = True
-
-                    break
-
-                except Exception as ex:
-                    if flags.debug:
-                        print('Bad message: %s (idx=%d)' % (ex, idx))
-
+        for msg, hole in thrift_msg_file:
+            print(pp.pformat(msg.as_dict) if flags.pretty else msg)
+            if hole:
+                holes.append(hole)
+            total_msg_read += 1
+            if 0 < flags.max_messages <= total_msg_read:
+                break
     except KeyboardInterrupt:
         pass
 
     if holes:
-        print('Read msgs: %d\nHoles: %d\n' % (nread, len(holes)))
+        print('Read msgs: %d\nHoles: %d\n' % (total_msg_read, len(holes)))
         if flags.show_holes:
             for idx, hole in enumerate(holes, start=1):
                 print('#%d: start=%d, size=%d' % (idx, hole[0], hole[1]))
     else:
-        print('Read msgs: %d\nNo bytes skipped' % nread)
+        print('Read msgs: %d\nNo bytes skipped' % total_msg_read)
