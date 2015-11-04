@@ -60,6 +60,8 @@ class ThriftFile(object):
         idx = self._padding
         while idx < len(self._data):
             tobject, hole = self._read_next(idx, len(self._data))
+            if tobject is None:
+                return
             if hole:
                 idx += hole[1]  # number of bytes skipped
             idx += tobject.bytes_length + self._padding
@@ -98,6 +100,9 @@ class ThriftMessageFile(ThriftFile):
             except Exception, ex:
                 if self._debug:
                     print('Bad message: %s (idx=%d)' % (ex, idx))
+
+        # nothing found
+        return (None, None)
 
 
 class ThriftStructFile(ThriftFile):
@@ -138,3 +143,6 @@ class ThriftStructFile(ThriftFile):
             except Exception, ex:
                 if self._debug:
                     print('Bad message: %s (idx=%d)' % (ex, idx))
+
+        # nothing found
+        return (None, None)
