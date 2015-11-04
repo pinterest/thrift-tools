@@ -26,6 +26,12 @@ class ThriftMessage(object):
         return self._length
 
     @property
+    def bytes_length(self):
+        """ for ThriftStruct, __len__ means something different so lets
+        add this other property to unify the way to refer to bytes """
+        return len(self)
+
+    @property
     def method(self):
         return self._method
 

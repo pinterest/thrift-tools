@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import abc
 import sys
 
 try:
@@ -15,6 +16,12 @@ from .thrift_struct import ThriftStruct
 
 
 class ThriftFile(object):
+    """
+    An abstract base class for implementations that read files contaning
+    different Thrift types.
+    """
+
+    __metaclass__ = abc.ABCMeta
 
     class Error(Exception):
         pass
@@ -45,6 +52,23 @@ class ThriftFile(object):
     def _data_slice(self, idx):
         return self._view[idx:].tobytes() if self._view else self._data[idx:]
 
+    def __iter__(self):
+        """
+        An iterator that yields a tuple of (thrift object, hole), where
+        hole is a tuple of (start, skipped) bytes.
+        """
+        idx = self._padding
+        while idx < len(self._data):
+            tobject, hole = self._read_next(idx, len(self._data))
+            if hole:
+                idx += hole[1]  # number of bytes skipped
+            idx += tobject.bytes_length + self._padding
+            yield tobject, hole
+
+    @abc.abstractmethod
+    def _read_next(self, start, end):
+        pass
+
 
 class ThriftMessageFile(ThriftFile):
     """
@@ -62,15 +86,6 @@ class ThriftMessageFile(ThriftFile):
         super(ThriftMessageFile, self).__init__(file_name, read_values, debug)
         self._padding = padding
         self._finagle_thrift = finagle_thrift
-
-    def __iter__(self):
-        idx = self._padding
-        while idx < len(self._data):
-            msg, hole = self._read_next(idx, len(self._data))
-            if hole:
-                idx += hole[1]  # number of bytes skipped
-            idx += len(msg) + self._padding
-            yield msg, hole
 
     def _read_next(self, start, end):
         for idx in range(start, end):
@@ -105,15 +120,6 @@ class ThriftStructFile(ThriftFile):
         super(ThriftStructFile, self).__init__(file_name, read_values, debug)
         self._padding = padding
         self._protocol = protocol
-
-    def __iter__(self):
-        idx = self._padding
-        while idx < len(self._data):
-            tstruct, hole = self._read_next(idx, len(self._data))
-            if hole:
-                idx += hole[1]  # number of bytes skipped
-            idx += tstruct.bytes_length + self._padding
-            yield tstruct, hole
 
     def _read_next(self, start, end):
         for idx in range(start, end):
