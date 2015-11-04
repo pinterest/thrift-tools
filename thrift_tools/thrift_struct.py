@@ -12,8 +12,19 @@ class ObjectTooBig(Error):
 class ThriftStruct(object):
     """A thrift struct"""
 
-    def __init__(self, fields):
+    def __init__(self, fields, length=0):
         self._fields = fields
+        self._length = length  # in bytes
+
+    @property
+    def bytes_length(self):
+        return self._length
+
+    @property
+    def as_dict(self):
+        return {
+            'fields': [field.as_dict for field in self.fields]
+        }
 
     @property
     def fields(self):
@@ -32,10 +43,11 @@ class ThriftStruct(object):
                                                           other.fields)))
 
     def __eq__(self, other):
-        return (isinstance(other, self.__class__)
-                and self.__dict__ == other.__dict__)
+        """ we ignore the length, it might not be set """
+        return isinstance(other, self.__class__) and self.fields == other.fields
 
     def __len__(self):
+        """ number of fields, NOT number of bytes """
         return len(self._fields)
 
     def __getitem__(self, key):
@@ -57,6 +69,9 @@ class ThriftStruct(object):
              read_values=False):
         fields = []
         nfields = 0
+
+        start = proto.trans._buffer.tell()
+
         proto.readStructBegin()
         while True:
             nfields += 1
@@ -79,7 +94,11 @@ class ThriftStruct(object):
 
             fields.append(ThriftField(cls.field_type_to_str(ftype), fid, value))
         proto.readStructEnd()
-        return cls(fields)
+
+        end = proto.trans._buffer.tell()
+        length = end - start
+
+        return cls(fields, length)
 
     @classmethod
     def read_field_value(cls, proto, ftype,
@@ -260,3 +279,11 @@ class ThriftField(object):
     @property
     def value(self):
         return self._value
+
+    @property
+    def as_dict(self):
+        return {
+            'field_id': self.field_id,
+            'field_type': self.field_type,
+            'value': self.value
+        }

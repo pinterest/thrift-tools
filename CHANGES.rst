@@ -11,7 +11,9 @@ Features
 ~~~~~~~~
 
 - introduce a root exception for thrift_struct
-
+- add --structs to thrift-file reader to allow
+  reading files that contain structs (instead of
+  messages)
 
 0.0.2 (2015-09-26)
 ------------------
