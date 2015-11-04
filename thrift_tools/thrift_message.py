@@ -22,7 +22,14 @@ class ThriftMessage(object):
         self._length = length
 
     def __len__(self):
+        """ in bytes """
         return self._length
+
+    @property
+    def bytes_length(self):
+        """ for ThriftStruct, __len__ means something different so lets
+        add this other property to unify the way to refer to bytes """
+        return len(self)
 
     @property
     def method(self):
@@ -43,10 +50,6 @@ class ThriftMessage(object):
     @property
     def header(self):
         return self._header
-
-    @property
-    def length(self):
-        return self._length
 
     def __str__(self):
         return 'method=%s, type=%s, seqid=%s, header=%s, fields=%s' % (

@@ -6,7 +6,18 @@ import argparse
 import pprint
 import sys
 
-from thrift_tools.thrift_file import ThriftMessageFile, ThriftFile
+from thrift.protocol.TBinaryProtocol import TBinaryProtocol
+from thrift.protocol.TCompactProtocol import TCompactProtocol
+from thrift.protocol.TJSONProtocol import TJSONProtocol
+
+from .thrift_file import (
+    ThriftFile,
+    ThriftMessageFile,
+    ThriftStructFile
+)
+
+
+VALID_PROTOCOLS = 'binary, compact or json'
 
 
 def get_flags():
@@ -15,6 +26,8 @@ def get_flags():
 
     p.add_argument('file', type=str, default='-',
                    help='File from which to read Thrift messages')
+    p.add_argument('--structs', default=False, action='store_true',
+                   help='Read structs instead messages')
     p.add_argument('--pretty', default=False, action='store_true',
                    help='Pretty print each Thrift message')
     p.add_argument('--finagle-thrift', default=False, action='store_true',
@@ -31,6 +44,9 @@ def get_flags():
                    'if you using a binary log format that prepends a timestamp '
                    '(long) + the message length (int), the padding would be of '
                    '12 bytes')
+    p.add_argument('--protocol', type=str, default='binary',
+                   help='Use a specific protocol for reading structs. Options: %s' %
+                   VALID_PROTOCOLS)
     p.add_argument('--debug', default=False, action='store_true',
                    help='Display debugging messages')
 
@@ -39,19 +55,50 @@ def get_flags():
 
 def main():
     flags = get_flags()
+    run(flags)
+
+
+def run(flags, output=sys.stdout):
     try :
-        thrift_msg_file = ThriftMessageFile(flags.file, flags.finagle_thrift,
-                                            not flags.skip_values, flags.padding)
+        if flags.structs:
+            # which protocol to use
+            if flags.protocol == 'binary':
+                protocol = TBinaryProtocol
+            elif flags.protocol == 'compact':
+                protocol = TCompactProtocol
+            elif flags.protocol == 'json':
+                protocol = TJSONProtocol
+            else:
+                output.write('Unknown protocol: %s' % flags.protocol)
+                output.write('Valid options for --protocol are: %s' % VALID_PROTOCOLS)
+                sys.exit(1)
+
+            thrift_file = ThriftStructFile(
+                protocol,
+                file_name=flags.file,
+                read_values=not flags.skip_values,
+                padding=flags.padding,
+                debug=flags.debug
+            )
+        else:
+            thrift_file = ThriftMessageFile(
+                file_name=flags.file,
+                finagle_thrift=flags.finagle_thrift,
+                read_values=not flags.skip_values,
+                padding=flags.padding,
+                debug=flags.debug
+            )
     except ThriftFile.Error as ex:
-        print(ex.message)
+        output.write(ex.message)
         sys.exit(1)
 
     pp = pprint.PrettyPrinter(indent=4)
     holes = []
     total_msg_read = 0
     try:
-        for msg, hole in thrift_msg_file:
-            print(pp.pformat(msg.as_dict) if flags.pretty else msg)
+        for msg, hole in thrift_file:
+            output.write(pp.pformat(msg.as_dict) if flags.pretty else msg)
+            output.write('\n')
             if hole:
                 holes.append(hole)
             total_msg_read += 1
@@ -60,10 +107,11 @@ def main():
     except KeyboardInterrupt:
         pass
 
+    what = 'structs' if flags.structs else 'msgs'
     if holes:
-        print('Read msgs: %d\nHoles: %d\n' % (total_msg_read, len(holes)))
+        output.write('Read %s: %d\nHoles: %d\n' % (what, total_msg_read, len(holes)))
         if flags.show_holes:
             for idx, hole in enumerate(holes, start=1):
-                print('#%d: start=%d, size=%d' % (idx, hole[0], hole[1]))
+                output.write('#%d: start=%d, size=%d' % (idx, hole[0], hole[1]))
     else:
-        print('Read msgs: %d\nNo bytes skipped' % total_msg_read)
+        output.write('Read %s: %d\nNo bytes skipped' % (what, total_msg_read))
