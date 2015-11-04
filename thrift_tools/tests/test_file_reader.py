@@ -52,8 +52,8 @@ class FileReaderTestCase(unittest.TestCase):
         output = StringIO()
         run(params, output)
 
-        self.assertIn('Cannot divide by 0)', output.getvalue())
-        self.assertIn('(i32, 1, 15)', output.getvalue())
+        self.assertIn('Cannot divide by 0', output.getvalue())
+        self.assertIn("'field_type': 'i32', 'value': 1", output.getvalue())
 
     def test_read_messages(self):
         params = Params(

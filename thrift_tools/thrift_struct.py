@@ -282,8 +282,9 @@ class ThriftField(object):
 
     @property
     def as_dict(self):
+        value = self.value.as_dict if hasattr(self.value, 'as_dict') else self.value
         return {
             'field_id': self.field_id,
             'field_type': self.field_type,
-            'value': self.value
+            'value': value
         }
