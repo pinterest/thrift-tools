@@ -44,6 +44,10 @@ class ThriftMessage(object):
     def header(self):
         return self._header
 
+    @property
+    def length(self):
+        return self._length
+
     def __str__(self):
         return 'method=%s, type=%s, seqid=%s, header=%s, fields=%s' % (
             self.method, self.type, self.seqid, self.header, str(self.args))
