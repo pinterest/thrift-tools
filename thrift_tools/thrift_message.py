@@ -62,7 +62,7 @@ class ThriftMessage(object):
             'type': self.type,
             'seqid': self.seqid,
             'header': self.header,
-            'args': self.args,
+            'args': self.args.as_dict,
             'length': len(self),
         }
 
