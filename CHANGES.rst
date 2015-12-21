@@ -1,6 +1,18 @@
 ChangeLog
 =========
 
+0.0.4 (2015-12-XX)
+------------------
+
+Bug Handling
+~~~~~~~~~~~~
+
+- handle files without valid messages
+
+Features
+~~~~~~~~
+
+
 0.0.3 (2015-11-04)
 ------------------
 
