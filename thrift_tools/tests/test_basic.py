@@ -5,6 +5,7 @@ import unittest
 from thrift_tools.sniffer import Sniffer
 from thrift_tools.stream_handler import StreamHandler
 from thrift_tools.thrift_struct import ThriftField, ThriftStruct
+from thrift_tools.thrift_message_factory import ThriftMessageFactory
 
 from .util import get_pcap_path
 
@@ -17,15 +18,25 @@ class BasicTestCase(unittest.TestCase):
         pass
 
     def test_calculator_service_binary(self):
+        ThriftMessageFactory.use_python_implementation()
+        self._test_protocol('binary')
+        ThriftMessageFactory.use_native_implementation()
         self._test_protocol('binary')
 
     def test_calculator_service_compact(self):
+        ThriftMessageFactory.use_python_implementation()
+        self._test_protocol('compact')
+        ThriftMessageFactory.use_native_implementation()
         self._test_protocol('compact')
 
     def test_calculator_service_json(self):
+        ThriftMessageFactory.use_python_implementation()
+        self._test_protocol('json')
+        ThriftMessageFactory.use_native_implementation()
         self._test_protocol('json')
 
     def test_finagle(self):
+        ThriftMessageFactory.use_python_implementation()
         queue = deque()
         pcap_file = get_pcap_path('finagle-thrift')
         handler = StreamHandler(queue, read_values=True, finagle_thrift=True)

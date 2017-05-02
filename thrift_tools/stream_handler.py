@@ -9,6 +9,7 @@ import traceback
 
 from .thrift_message import ThriftMessage
 
+from thrift_message_factory import ThriftMessageFactory
 
 class StreamContext(object):
     def __init__(self):
@@ -71,16 +72,17 @@ class StreamHandler(object):
 
         # FIXME: a bit of brute force to find the start of a message.
         #        Is there a magic byte/string we can look for?
-
+        reader = ThriftMessageFactory.reader_class()
         view = memoryview(context.bytes)
         for idx in range(0, len(context.bytes)):
             try:
                 data_slice = view[idx:].tobytes()
-                msg, msglen = ThriftMessage.read(
+                msg, msglen = reader.read(
                     data_slice,
                     protocol=self._protocol,
                     finagle_thrift=self._finagle_thrift,
                     read_values=self._read_values)
+                
             except EOFError:
                 continue
             except Exception as ex:

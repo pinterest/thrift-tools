@@ -13,6 +13,7 @@ from thrift.protocol.TJSONProtocol import TJSONProtocol
 from .message_sniffer import MessageSnifferOptions, MessageSniffer
 from .printer import FormatOptions, LatencyPrinter, PairedPrinter, Printer
 
+from .thrift_message_factory import ThriftMessageFactory
 
 VALID_PROTOCOLS = 'auto, binary, compact or json'
 
@@ -43,6 +44,8 @@ def get_flags():
     p.add_argument('--protocol', type=str, default='auto',
                    help='Use a specific protocol. Options: %s' %
                    VALID_PROTOCOLS)
+    p.add_argument('--use-native', default=False, action='store_true',
+                   help='Use C implementation')
 
     cmds = p.add_subparsers(dest='cmd')
 
@@ -112,6 +115,11 @@ def main():
         print('Unknown protocol: %s' % flags.protocol)
         print('Valid options for --protocol are: %s' % VALID_PROTOCOLS)
         sys.exit(1)
+
+    if flags.use_native:
+      ThriftMessageFactory.use_native_implementation()
+    else:
+      ThriftMessageFactory.use_python_implementation()
 
     # launch the thrift message sniffer
     options = MessageSnifferOptions(
