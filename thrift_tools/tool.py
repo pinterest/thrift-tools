@@ -69,6 +69,8 @@ def get_flags():  # pragma: no cover
                       help='Shows header, fields and values')
     dump.add_argument('--json', default=False, action='store_true',
                       help='Outputs messages as JSON')
+    dump.add_argument('--idl-file', type=str, default='',
+                   help='Use .thrift file to resolve types')
 
     # stats
     stats = cmds.add_parser('stats')
@@ -94,6 +96,7 @@ def main():
             flags.show_header or flags.show_all,
             flags.show_fields or flags.show_all,
             flags.json,
+            flags.idl_file,
             )
         printer = printer_cls(format_opts)
         read_values = flags.show_values or flags.show_all

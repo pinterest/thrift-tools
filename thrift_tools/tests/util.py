@@ -12,3 +12,7 @@ def get_pcap_path(capture_file):
 
 def get_log_path(log_file):
     return os.path.join(_resources_dir, '%s.logfile' % (log_file))
+
+
+def get_thrift_path(thrift_file):
+    return os.path.join(_resources_dir, '%s.thrift' % (thrift_file))
