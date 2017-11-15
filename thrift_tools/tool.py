@@ -40,6 +40,8 @@ def get_flags():  # pragma: no cover
                    help='Path to pcap file, for offline introspection')
     p.add_argument('--debug', default=False, action='store_true',
                    help='Display debugging messages')
+    p.add_argument('--framed', default=False, action='store_true',
+                   help='Framed Thrift transport')
     p.add_argument('--protocol', type=str, default='auto',
                    help='Use a specific protocol. Options: %s' %
                    VALID_PROTOCOLS)
@@ -124,7 +126,8 @@ def main():
         read_values=read_values,
         max_queued=flags.max_queued,
         max_message_size=flags.max_message_size,
-        debug=flags.debug
+        debug=flags.debug,
+        framed=flags.framed,
         )
     message_sniffer = MessageSniffer(options, printer)
 
