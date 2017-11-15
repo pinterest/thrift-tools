@@ -76,9 +76,9 @@ class ThriftMessage(object):
 
     # some sane defaults to keep memory usage tight
     MAX_FIELDS = 1000
-    MAX_LIST_SIZE = 10000
-    MAX_MAP_SIZE = 10000
-    MAX_SET_SIZE = 10000
+    MAX_LIST_SIZE = 1000000
+    MAX_MAP_SIZE = 1000000
+    MAX_SET_SIZE = 1000000
 
     @classmethod
     def read(cls, data,
