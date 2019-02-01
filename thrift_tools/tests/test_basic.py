@@ -30,7 +30,7 @@ class BasicTestCase(unittest.TestCase):
         pcap_file = get_pcap_path('finagle-thrift')
         handler = StreamHandler(queue, read_values=True, finagle_thrift=True)
 
-        sniffer = Sniffer('ignore', 9090, handler, offline=pcap_file)
+        sniffer = Sniffer(None, 9090, handler, offline=pcap_file)
         sniffer.join()
 
         self.assertEquals(len(queue), 22)
@@ -76,7 +76,7 @@ class BasicTestCase(unittest.TestCase):
         pcap_file = get_pcap_path('calc-service-%s' % protoname)
         handler = StreamHandler(queue, read_values=True, debug=True)
 
-        sniffer = Sniffer('ignore', 9090, handler, offline=pcap_file)
+        sniffer = Sniffer(None, 9090, handler, offline=pcap_file)
         sniffer.join()
 
         self.assertEquals(len(queue), 10)
