@@ -11,6 +11,7 @@ Bug Handling
 
 Features
 ~~~~~~~~
+- update to scapy 2.4.2
 
 
 0.0.3 (2015-11-04)
