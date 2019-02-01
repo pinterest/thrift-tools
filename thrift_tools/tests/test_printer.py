@@ -12,7 +12,7 @@ from .util import get_pcap_path
 
 def options():
     return MessageSnifferOptions(
-        iface='ignore',
+        iface=None,
         port=9090,
         ip=None,
         pcap_file=get_pcap_path('calc-service-binary'),
