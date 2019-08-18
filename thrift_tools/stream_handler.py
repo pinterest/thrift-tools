@@ -12,7 +12,7 @@ from .thrift_message import ThriftMessage
 
 class StreamContext(object):
     def __init__(self):
-        self.bytes = ''
+        self.bytes = b''
 
 
 class StreamHandler(object):
@@ -72,10 +72,10 @@ class StreamHandler(object):
         # FIXME: a bit of brute force to find the start of a message.
         #        Is there a magic byte/string we can look for?
 
-        view = memoryview(context.bytes)
+        view = context.bytes
         for idx in range(0, len(context.bytes)):
             try:
-                data_slice = view[idx:].tobytes()
+                data_slice = view[idx:]
                 msg, msglen = ThriftMessage.read(
                     data_slice,
                     protocol=self._protocol,

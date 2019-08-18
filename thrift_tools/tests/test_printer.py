@@ -1,4 +1,7 @@
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import unittest
 
@@ -82,32 +85,32 @@ class PrinterTestCase(unittest.TestCase):
     def _assertMessages(self, output):
         """ this is a bit fragile... """
         self.assertIn(
-            '[22:55:50:387214] 127.0.0.1:51112 -> 127.0.0.1:9090: method=ping, type=call, seqid=0',
+            '127.0.0.1:51112 -> 127.0.0.1:9090: method=ping, type=call, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:387370] 127.0.0.1:9090 -> 127.0.0.1:51112: method=ping, type=reply, seqid=0',
+            '127.0.0.1:9090 -> 127.0.0.1:51112: method=ping, type=reply, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:387492] 127.0.0.1:51112 -> 127.0.0.1:9090: method=add, type=call, seqid=0',
+            '127.0.0.1:51112 -> 127.0.0.1:9090: method=add, type=call, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:387596] 127.0.0.1:9090 -> 127.0.0.1:51112: method=add, type=reply, seqid=0',
+            '127.0.0.1:9090 -> 127.0.0.1:51112: method=add, type=reply, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:387696] 127.0.0.1:51112 -> 127.0.0.1:9090: method=calculate, type=call, seqid=0',
+            '127.0.0.1:51112 -> 127.0.0.1:9090: method=calculate, type=call, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:387840] 127.0.0.1:9090 -> 127.0.0.1:51112: method=calculate, type=reply, seqid=0',
+            '127.0.0.1:9090 -> 127.0.0.1:51112: method=calculate, type=reply, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:388615] 127.0.0.1:51112 -> 127.0.0.1:9090: method=calculate, type=call, seqid=0',
+            '127.0.0.1:51112 -> 127.0.0.1:9090: method=calculate, type=call, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:388725] 127.0.0.1:9090 -> 127.0.0.1:51112: method=calculate, type=reply, seqid=0',
+            '127.0.0.1:9090 -> 127.0.0.1:51112: method=calculate, type=reply, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:388811] 127.0.0.1:51112 -> 127.0.0.1:9090: method=getStruct, type=call, seqid=0',
+            '127.0.0.1:51112 -> 127.0.0.1:9090: method=getStruct, type=call, seqid=0',
             output.getvalue())
         self.assertIn(
-            '[22:55:50:388905] 127.0.0.1:9090 -> 127.0.0.1:51112: method=getStruct, type=reply, seqid=0\n',
+            '127.0.0.1:9090 -> 127.0.0.1:51112: method=getStruct, type=reply, seqid=0\n',
             output.getvalue())

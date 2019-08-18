@@ -1,3 +1,4 @@
+from six.moves import range as xrange
 from thrift.Thrift import TType
 
 

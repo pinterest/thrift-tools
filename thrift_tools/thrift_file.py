@@ -97,7 +97,7 @@ class ThriftMessageFile(ThriftFile):
                                             read_values=self._read_values)
                 skipped = idx - start
                 return (msg, None) if skipped == 0 else (msg, (start, skipped))
-            except Exception, ex:
+            except Exception as ex:
                 if self._debug:
                     print('Bad message: %s (idx=%d)' % (ex, idx))
 
@@ -140,7 +140,7 @@ class ThriftStructFile(ThriftFile):
                     read_values=self._read_values)
                 skipped = idx - start
                 return (tstruct, None) if skipped == 0 else (tstruct, (start, skipped))
-            except Exception, ex:
+            except Exception as ex:
                 if self._debug:
                     print('Bad message: %s (idx=%d)' % (ex, idx))
 

@@ -47,9 +47,9 @@ setup(
     scripts=['bin/thrift-tool', 'bin/thrift-file-reader'],
       install_requires=[
           'ansicolors',
-          'dpkt',
+          'dpkt==1.9.2',
           'scapy==2.4.2',
-          'thrift==0.9.2',
+          'thrift==0.11.0',
           'tabulate',
       ],
       tests_require=[
@@ -57,7 +57,8 @@ setup(
           'dpkt',
           'nose',
           'scapy==2.4.2',
-          'thrift==0.9.2',
+          'six==1.12.0',
+          'thrift==0.11.0',
           'tabulate',
       ],
       extras_require={
@@ -66,7 +67,8 @@ setup(
               'dpkt',
               'nose',
               'scapy==2.4.2',
-              'thrift==0.9.2',
+              'six==1.12.0',
+              'thrift==0.11.0',
               'tabulate',
               ],
       },
