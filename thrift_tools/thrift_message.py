@@ -187,7 +187,7 @@ class ThriftMessage(object):
     @classmethod
     def is_json_protocol(cls, data):
         # FIXME: more elaborate parsing would make this more robust
-        return data.startswith(to_bytes('[1'))
+        return data.tobytes().startswith(to_bytes('[1'))
 
     @staticmethod
     def message_type_to_str(mtype):

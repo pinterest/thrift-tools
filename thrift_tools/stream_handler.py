@@ -72,7 +72,7 @@ class StreamHandler(object):
         # FIXME: a bit of brute force to find the start of a message.
         #        Is there a magic byte/string we can look for?
 
-        view = context.bytes
+        view = memoryview(context.bytes)
         for idx in range(0, len(context.bytes)):
             try:
                 data_slice = view[idx:]
