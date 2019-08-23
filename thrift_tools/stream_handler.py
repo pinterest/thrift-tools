@@ -12,7 +12,7 @@ from .thrift_message import ThriftMessage
 
 class StreamContext(object):
     def __init__(self):
-        self.bytes = ''
+        self.bytes = b''
 
 
 class StreamHandler(object):
@@ -75,7 +75,7 @@ class StreamHandler(object):
         view = memoryview(context.bytes)
         for idx in range(0, len(context.bytes)):
             try:
-                data_slice = view[idx:].tobytes()
+                data_slice = view[idx:]
                 msg, msglen = ThriftMessage.read(
                     data_slice,
                     protocol=self._protocol,

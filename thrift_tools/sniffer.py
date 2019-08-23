@@ -8,11 +8,11 @@ import sys
 import time
 import traceback
 
-from util import get_ip, get_ip_packet
+from .util import get_ip, get_ip_packet, to_bytes
 
 from scapy.sendrecv import sniff
 from scapy.config import conf as scapy_conf
-
+from six.moves import intern
 
 scapy_conf.logLevel = logging.ERROR  # shush scappy
 
@@ -70,9 +70,9 @@ class Stream(object):
         data = []
         for packet in self.pop(nbytes):
             last_timestamp = packet.timestamp
-            data.append(packet.data.data)
+            data.append(to_bytes(packet.data.data))
 
-        return ''.join(data), last_timestamp
+        return b''.join(data), last_timestamp
 
     def push(self, ip_packet):
         """ push the packet into the queue """
@@ -154,7 +154,7 @@ class Dispatcher(Thread):
                         handler(stream)
                     except Exception as ex:
                         print('handler exception: %s' % ex)
-            except Exception:
+            except Exception as ex:
                 time.sleep(0.00001)
 
 

@@ -59,3 +59,17 @@ def get_ip_packet(data, client_port, server_port, is_loopback=False):
 def get_ip(ip_packet, packed_addr):
     af_type = socket.AF_INET if type(ip_packet) == dpkt.ip.IP else socket.AF_INET6
     return socket.inet_ntop(af_type, packed_addr)
+
+
+def to_bytes(value):
+    """ str to bytes (py3k) """
+    vtype = type(value)
+
+    if vtype == bytes or vtype == type(None):
+        return value
+
+    try:
+        return vtype.encode(value)
+    except UnicodeEncodeError:
+        pass
+    return value

@@ -215,7 +215,7 @@ class LatencyPrinter(object):
         for key, latencies in self._latencies_by_method.items():
             result = {}
             result['count'] = len(latencies)
-            result['avg'] = sum(latencies) / len(latencies)
+            result['avg'] = sum(latencies) / len(latencies) if latencies else 0
             result['min'] = min(latencies)
             result['max'] = max(latencies)
             latencies = sorted(latencies)

@@ -1,13 +1,15 @@
 """ helpers for deserializing Thrift messages """
 
 from struct import unpack
-from thrift.Thrift import TMessageType
 
+from .thrift_struct import ThriftStruct
+from .util import to_bytes
+
+from thrift.Thrift import TMessageType
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TCompactProtocol import TCompactProtocol
 from thrift.protocol.TJSONProtocol import TJSONProtocol
 from thrift.transport import TTransport
-from thrift_tools.thrift_struct import ThriftStruct
 
 
 class ThriftMessage(object):
@@ -92,7 +94,7 @@ class ThriftMessage(object):
 
         # do we have enough data?
         if len(data) < cls.MIN_MESSAGE_SIZE:
-            raise ValueError('not enough data')
+            raise ValueError('not enough data: %d' % len(data))
 
         if protocol is None:
             protocol = cls.detect_protocol(data, fallback_protocol)
@@ -112,7 +114,7 @@ class ThriftMessage(object):
                     max_map_size,
                     max_set_size,
                     read_values)
-            except:
+            except Exception as ex:
                 # reset stream, maybe it's not finagle-thrift
                 trans = TTransport.TMemoryBuffer(data)
                 proto = protocol(trans)
@@ -168,7 +170,7 @@ class ThriftMessage(object):
 
     @classmethod
     def is_compact_protocol(cls, data):
-        result, = unpack('!B', data[0])
+        result, = unpack('!B', data[:1])
         return result == cls.COMPACT_PROTOCOL_ID
 
     BINARY_PROTOCOL_VERSION_MASK = -65536  # 0xffff0000
@@ -185,7 +187,7 @@ class ThriftMessage(object):
     @classmethod
     def is_json_protocol(cls, data):
         # FIXME: more elaborate parsing would make this more robust
-        return data.startswith('[1')
+        return data.tobytes().startswith(b'[1')
 
     @staticmethod
     def message_type_to_str(mtype):
