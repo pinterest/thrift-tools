@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from six.moves import range as xrange
 from thrift.Thrift import TType
 
@@ -154,7 +156,10 @@ class ThriftStruct(object):
                 proto.skip(ftype)
         elif ftype == TType.STRING:
             if read_values:
-                value = proto.readString()
+                try:
+                    value = proto.readString()
+                except UnicodeDecodeError:
+                    value = ''
             else:
                 proto.skip(ftype)
         elif ftype == TType.LIST:
