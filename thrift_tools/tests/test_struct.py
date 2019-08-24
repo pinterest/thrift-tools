@@ -1,4 +1,5 @@
 import unittest
+
 from thrift_tools.thrift_struct import ThriftField, ThriftStruct
 
 

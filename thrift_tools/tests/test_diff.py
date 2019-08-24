@@ -72,5 +72,3 @@ class ThriftDiffTestCase(unittest.TestCase):
         # We diffed identical messages, verify that diff reflects that
         self.assertListEqual([f1, f2], diffs[0].fields_with_same_value)
         self.assertEqual(0, len(diffs[0].field_with_different_value))
-
-
