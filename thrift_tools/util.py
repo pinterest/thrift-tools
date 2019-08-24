@@ -15,10 +15,12 @@
 # ==================================================================================================
 
 
-""" network packets & header processing stuff
+"""
+Network packets & header processing stuff
 
 This comes from:
-  https://github.com/twitter/zktraffic/blob/master/zktraffic/base/network.py
+
+https://github.com/twitter/zktraffic/blob/master/zktraffic/base/network.py
 
 with a few corner cases handled (i.e.: header.unpack() might raise an exception)
 """
@@ -30,6 +32,7 @@ import dpkt
 
 _loopback = dpkt.loopback.Loopback()
 _ethernet = dpkt.ethernet.Ethernet()
+
 
 def get_ip_packet(data, client_port, server_port, is_loopback=False):
     """ if client_port is 0 any client_port is good """
@@ -63,9 +66,7 @@ def get_ip(ip_packet, packed_addr):
 
 def to_bytes(value):
     """ str to bytes (py3k) """
-    vtype = type(value)
-
-    if vtype == bytes or vtype == type(None):
+    if value is None or isinstance(value, bytes):
         return value
 
     try:
