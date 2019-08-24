@@ -157,7 +157,7 @@ class PairedPrinter(object):
 class LatencyPrinter(object):
     """ Reports latencies for the seen (req, rep) pairs """
     def __init__(self, expected_calls, output=sys.stdout):
-         # msgs by [src][dst][method_name][seqid]
+        # msgs by [src][dst][method_name][seqid]
         self._requests = defaultdict(
             lambda: defaultdict(lambda: defaultdict(dict)))
 

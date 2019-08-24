@@ -59,7 +59,7 @@ def main():
 
 
 def run(flags, output=sys.stdout):
-    try :
+    try:
         if flags.structs:
             # which protocol to use
             if flags.protocol == 'binary':

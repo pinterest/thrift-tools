@@ -54,6 +54,17 @@ class MessageSniffer(Thread):
         self.start()
 
     def status(self):
+        values = (
+            self.isAlive(),
+            len(self._queue),
+            self._handler.seen_streams,
+            self._handler.unrecognized_streams,
+            self._handler.seen_thrift_msgs,
+            self._handler.pending_thrift_msgs,
+            self._sniffer.isAlive(),
+            self._sniffer.pending_ip_packets,
+            self._sniffer.dispatcher.isAlive()
+        )
         return """
 alive:                  %s
 queue size:             %d
@@ -64,16 +75,7 @@ pending thrift msgs:    %d
 sniffer alive:          %s
 pending ip packets:     %d
 dispatcher alive:       %s
-""" % (self.isAlive(),
-       len(self._queue),
-       self._handler.seen_streams,
-       self._handler.unrecognized_streams,
-       self._handler.seen_thrift_msgs,
-       self._handler.pending_thrift_msgs,
-       self._sniffer.isAlive(),
-       self._sniffer.pending_ip_packets,
-       self._sniffer.dispatcher.isAlive()
-       )
+""" % values
 
     def add_handler(self, handler):
         if handler is None:
