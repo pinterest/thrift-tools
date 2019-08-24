@@ -17,7 +17,7 @@ from .printer import FormatOptions, LatencyPrinter, PairedPrinter, Printer
 VALID_PROTOCOLS = 'auto, binary, compact or json'
 
 
-def get_flags():
+def get_flags():  # pragma: no cover
     p = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
