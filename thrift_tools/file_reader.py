@@ -20,7 +20,7 @@ from .thrift_file import (
 VALID_PROTOCOLS = 'binary, compact or json'
 
 
-def get_flags():
+def get_flags():  # pragma: no cover
     p = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -53,13 +53,13 @@ def get_flags():
     return p.parse_args()
 
 
-def main():
+def main():  # pragma: no cover
     flags = get_flags()
     run(flags)
 
 
 def run(flags, output=sys.stdout):
-    try :
+    try:
         if flags.structs:
             # which protocol to use
             if flags.protocol == 'binary':
@@ -88,7 +88,7 @@ def run(flags, output=sys.stdout):
                 padding=flags.padding,
                 debug=flags.debug
             )
-    except ThriftFile.Error as ex:
+    except ThriftFile.Error as ex:  # pragma: no cover
         output.write(ex.message)
         sys.exit(1)
 
@@ -104,7 +104,7 @@ def run(flags, output=sys.stdout):
             total_msg_read += 1
             if 0 < flags.max_messages <= total_msg_read:
                 break
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:  # pragma: no cover
         pass
 
     what = 'structs' if flags.structs else 'msgs'

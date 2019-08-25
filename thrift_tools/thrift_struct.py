@@ -170,7 +170,7 @@ class ThriftStruct(object):
             if read_values:
                 value = [_read(etype) for _ in xrange(size)]
             else:
-                for i in xrange(size):
+                for _ in xrange(size):
                     proto.skip(etype)
             proto.readListEnd()
         elif ftype == TType.MAP:
@@ -179,12 +179,12 @@ class ThriftStruct(object):
                 raise ObjectTooBig('map too big: %d' % size)
             value = {}
             if read_values:
-                for i in xrange(size):
+                for _ in xrange(size):
                     k = _read(ktype)
                     v = _read(vtype)
                     value[k] = v
             else:
-                for i in xrange(size):
+                for _ in xrange(size):
                     proto.skip(ktype)
                     proto.skip(vtype)
             proto.readMapEnd()
@@ -194,10 +194,10 @@ class ThriftStruct(object):
                 raise ObjectTooBig('set too big: %d' % size)
             value = set()
             if read_values:
-                for i in xrange(size):
+                for _ in xrange(size):
                     value.add(_read(etype))
             else:
-                for i in xrange(size):
+                for _ in xrange(size):
                     proto.skip(etype)
             proto.readSetEnd()
         else:
