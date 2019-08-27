@@ -51,6 +51,7 @@ setup(
       install_requires=[
           'ansicolors',
           'dpkt==1.9.2',
+          'ptsd==0.2.0',
           'scapy==2.4.2',
           'thrift==0.11.0',
           'tabulate',
@@ -59,6 +60,7 @@ setup(
           'ansicolors',
           'dpkt',
           'nose',
+          'ptsd==0.2.0',
           'scapy==2.4.2',
           'six==1.12.0',
           'thrift==0.11.0',
@@ -69,6 +71,7 @@ setup(
               'ansicolors',
               'dpkt',
               'nose',
+              'ptsd==0.2.0',
               'scapy==2.4.2',
               'six==1.12.0',
               'thrift==0.11.0',
