@@ -118,9 +118,11 @@ def main():
         print('Valid options for --protocol are: %s' % VALID_PROTOCOLS)
         sys.exit(1)
 
+    iface = None if flags.pcap_file else flags.iface
+
     # launch the thrift message sniffer
     options = MessageSnifferOptions(
-        iface=flags.iface,
+        iface=iface,
         port=flags.port,
         ip=flags.ip,
         pcap_file=flags.pcap_file,
