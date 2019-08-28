@@ -11,6 +11,7 @@ from tabulate import tabulate
 import colors
 
 from .stats import percentile
+from .idl import parse_idl_file
 
 
 fromtimestamp = datetime.fromtimestamp
@@ -22,7 +23,10 @@ FormatOptions = namedtuple('FormatOptions', [
     'show_header',
     'show_fields',
     'json',
+    'idl_file',
 ])
+# make idl_file optional for backward compatibility
+FormatOptions.__new__.__defaults__ = (None,)
 
 
 def print_color(s, color_id, output=sys.stdout):
@@ -33,7 +37,8 @@ def print_color(s, color_id, output=sys.stdout):
 
 
 def print_msg(timestamp, src, dst, msg, format_opts,
-              prefix='', indent=0, output=sys.stdout):
+              prefix='', indent=0, output=sys.stdout,
+              idl_function=None):
     timestr = fromtimestamp(timestamp).strftime('%H:%M:%S:%f')
 
     def pretty(part):
@@ -49,8 +54,18 @@ def print_msg(timestamp, src, dst, msg, format_opts,
     else:
         header_line = ''
 
+    args = msg.args
+
+    if idl_function is not None:
+        try:
+            args = idl_function.get_args(msg)
+        except:
+            import traceback
+            traceback.print_exc()
+            args = msg.args
+
     if format_opts.show_fields:
-        fields_line = '%sfields: %s\n' % (indent, pretty(msg.args))
+        fields_line = '%sfields: %s\n' % (indent, pretty(args))
     else:
         fields_line = ''
 
@@ -102,6 +117,11 @@ class PairedPrinter(object):
         self._format_opts = format_opts
         self._output = output
 
+        self.idl = None
+
+        if self._format_opts.idl_file:
+            self.idl = parse_idl_file(self._format_opts.idl_file)
+
         # msgs by [src][dst][method_name]
         self._requests = defaultdict(
             lambda: defaultdict(lambda: defaultdict(deque)))
@@ -148,10 +168,15 @@ class PairedPrinter(object):
         return True  # keep the sniffer running
 
     def _print_pair(self, reqtime, request, reptime, reply, src, dst):
+        idl_function = None
+        if self.idl is not None:
+            idl_function = self.idl.get_function(request.method)
+
         print_msg(reqtime, src, dst, request, self._format_opts,
-                  output=self._output)
+                  output=self._output, idl_function=idl_function)
         print_msg(reptime, dst, src, reply, self._format_opts,
-                  prefix='------>', indent=8, output=self._output)
+                  prefix='------>', indent=8, output=self._output,
+                  idl_function=idl_function)
 
 
 class LatencyPrinter(object):

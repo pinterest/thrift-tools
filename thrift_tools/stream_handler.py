@@ -6,6 +6,7 @@ from collections import defaultdict
 
 import sys
 import traceback
+from struct import unpack
 
 from .thrift_message import ThriftMessage
 
@@ -22,7 +23,8 @@ class StreamHandler(object):
                  finagle_thrift=False,
                  max_message_size=1024*1000,
                  read_values=False,
-                 debug=False):
+                 debug=False,
+                 framed=False):
         self._contexts_by_streams = defaultdict(StreamContext)
         self._pop_size = 1024  # TODO: what's a good value here?
         self._outqueue = outqueue
@@ -30,6 +32,7 @@ class StreamHandler(object):
         self._finagle_thrift = finagle_thrift
         self._max_message_size = max_message_size
         self._debug = debug
+        self._framed = framed
         self._read_values = read_values
         self._seen_messages = 0
         self._recognized_streams = set()  # streams from which msgs have been read
@@ -72,8 +75,21 @@ class StreamHandler(object):
         # FIXME: a bit of brute force to find the start of a message.
         #        Is there a magic byte/string we can look for?
 
+        start = 0
+
+        if self._framed:
+            if len(context.bytes) == 4: # just frame size, no frame
+                return
+
+            frame_size = unpack('!i', context.bytes[:4])[0]
+
+            if len(context.bytes) < frame_size + 4:
+                return
+
+            start = 4
+
         view = memoryview(context.bytes)
-        for idx in range(0, len(context.bytes)):
+        for idx in range(start, len(context.bytes)):
             try:
                 data_slice = view[idx:]
                 msg, msglen = ThriftMessage.read(

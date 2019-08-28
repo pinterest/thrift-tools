@@ -40,6 +40,8 @@ def get_flags():  # pragma: no cover
                    help='Path to pcap file, for offline introspection')
     p.add_argument('--debug', default=False, action='store_true',
                    help='Display debugging messages')
+    p.add_argument('--framed', default=False, action='store_true',
+                   help='Framed Thrift transport')
     p.add_argument('--protocol', type=str, default='auto',
                    help='Use a specific protocol. Options: %s' %
                    VALID_PROTOCOLS)
@@ -67,6 +69,8 @@ def get_flags():  # pragma: no cover
                       help='Shows header, fields and values')
     dump.add_argument('--json', default=False, action='store_true',
                       help='Outputs messages as JSON')
+    dump.add_argument('--idl-file', type=str, default='',
+                   help='Use .thrift file to resolve types')
 
     # stats
     stats = cmds.add_parser('stats')
@@ -92,6 +96,7 @@ def main():
             flags.show_header or flags.show_all,
             flags.show_fields or flags.show_all,
             flags.json,
+            flags.idl_file,
             )
         printer = printer_cls(format_opts)
         read_values = flags.show_values or flags.show_all
@@ -113,9 +118,11 @@ def main():
         print('Valid options for --protocol are: %s' % VALID_PROTOCOLS)
         sys.exit(1)
 
+    iface = None if flags.pcap_file else flags.iface
+
     # launch the thrift message sniffer
     options = MessageSnifferOptions(
-        iface=flags.iface,
+        iface=iface,
         port=flags.port,
         ip=flags.ip,
         pcap_file=flags.pcap_file,
@@ -124,7 +131,8 @@ def main():
         read_values=read_values,
         max_queued=flags.max_queued,
         max_message_size=flags.max_message_size,
-        debug=flags.debug
+        debug=flags.debug,
+        framed=flags.framed,
         )
     message_sniffer = MessageSniffer(options, printer)
 

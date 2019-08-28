@@ -33,6 +33,10 @@ below):
     $ cd thrift-tools
     $ sudo FROM_SOURCE=1 bin/thrift-tool --iface=eth0 --port 9091 dump --show-all --pretty
     ...
+    $ FROM_SOURCE=1 bin/thrift-tool --port 9090 \
+        --pcap-file thrift_tools/tests/resources/calc-service-binary.pcap \
+        dump --show-all --pretty --color \
+        --idl-file=thrift_tools/tests/resources/tutorial.thrift
 
 Tools
 ~~~~~
@@ -115,6 +119,13 @@ command:
     search2        61  0.00860996  0.00636292  0.0188479   0.010778    0.015192    0.0174422   0.0187074
     doc            39  0.00134846  0.00099802  0.00274897  0.00177183  0.00199242  0.00256242  0.00273031
     287 unmatched calls
+
+You can also specify .thrift file for nicer output:
+
+::
+
+    $ sudo thrift-tool --port 9091 dump --show-all --pretty --color --idl-file /path/to/myidl.thrift
+    ...
 
 To list all the available options:
 
