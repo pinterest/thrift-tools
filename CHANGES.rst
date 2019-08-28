@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.0.6 (2019-08-28)
+------------------
+
+Features
+~~~~~~~~
+- Add support for Thrift IDL parsing and printing
+
 0.0.5 (2019-08-18)
 ------------------
 
