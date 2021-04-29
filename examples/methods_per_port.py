@@ -96,7 +96,7 @@ def discover_methods(iface):
     # done when all sniffers are done (or the user gets tired)
     try:
         while True:
-            if all(not sniff.isAlive() for sniff in sniffers):
+            if all(not sniff.is_alive() for sniff in sniffers):
                 break
     except KeyboardInterrupt:
         pass

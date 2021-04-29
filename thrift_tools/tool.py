@@ -145,7 +145,7 @@ def main():
 
     # loop forever
     try:
-        while message_sniffer.isAlive():
+        while message_sniffer.is_alive():
             message_sniffer.join(1)
     except (KeyboardInterrupt, SystemExit):
         pass

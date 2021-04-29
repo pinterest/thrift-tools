@@ -59,15 +59,15 @@ class MessageSniffer(Thread):
 
     def status(self):
         values = (
-            self.isAlive(),
+            self.is_alive(),
             len(self._queue),
             self._handler.seen_streams,
             self._handler.unrecognized_streams,
             self._handler.seen_thrift_msgs,
             self._handler.pending_thrift_msgs,
-            self._sniffer.isAlive(),
+            self._sniffer.is_alive(),
             self._sniffer.pending_ip_packets,
-            self._sniffer.dispatcher.isAlive()
+            self._sniffer.dispatcher.is_alive()
         )
         return """
 alive:                  %s
@@ -100,7 +100,7 @@ dispatcher alive:       %s
         while running:
 
             # if the sniffer finished and the queue is empty, we are done
-            if not sniffer.isAlive() and len(self._queue) == 0:
+            if not sniffer.is_alive() and len(self._queue) == 0:
                 break
 
             try:
@@ -127,11 +127,11 @@ dispatcher alive:       %s
             print('%d messages left in the queue' % len(self._queue))
 
     def stop(self, wait_for_stopped=False):
-        if not self.isAlive():
+        if not self.is_alive():
             return
 
         self._queue.append(DONE_TUPLE)
 
         if wait_for_stopped:
-            while self.isAlive():
+            while self.is_alive():
                 time.sleep(0.01)
