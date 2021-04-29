@@ -1,18 +1,15 @@
 language: python
 sudo: false
 python:
-  - "2.7"
-  - "3.5"
   - "3.6"
-matrix:
-  include:
-    - python: 3.7
-      dist: xenial
-      sudo: true
+  - "3.7"
+  - "3.8"
+  - "3.9"
+  - "3.9-dev"
+  - "nightly"
 install:
   - pip install -r requirements.txt
-  - pip install coverage
-  - pip install coveralls
+  - pip install coverage coveralls
 script: python setup.py nosetests --with-coverage --cover-package=thrift_tools
 after_success:
   coveralls
