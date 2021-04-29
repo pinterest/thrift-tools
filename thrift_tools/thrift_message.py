@@ -152,6 +152,22 @@ class ThriftMessage(object):
         return cls(method, mtype, seqid, args, header, msglen), msglen
 
     @classmethod
+    def ping(cls, protocol=TBinaryProtocol):
+        mem_transport = TTransport.TMemoryBuffer()
+        transport = TTransport.TFramedTransport(mem_transport)
+        proto = protocol(transport)
+
+        proto.writeMessageBegin('ping', TMessageType.CALL, 0x0)
+        proto.writeStructBegin('')
+        proto.writeFieldStop()
+        proto.writeStructEnd()
+        proto.writeMessageEnd()
+
+        transport.flush()
+        mem_transport._buffer.seek(0)
+        return mem_transport._buffer.read()
+
+    @classmethod
     def detect_protocol(cls, data, default=None):
         """ TODO: support fbthrift, finagle-thrift, finagle-mux, CORBA """
         if cls.is_compact_protocol(data):
@@ -201,3 +217,15 @@ class ThriftMessage(object):
             return 'oneway'
         else:
             raise ValueError('Unknown message type: %s' % mtype)
+
+    @staticmethod
+    def protocol_str_to_class(proto):
+        """ TODO: support fbthrift, finagle-thrift, finagle-mux, CORBA """
+        if proto == 'compact' or proto == 'tcompact':
+            return TCompactProtocol
+        elif proto == 'binary' or proto == 'tbinary':
+            return TBinaryProtocol
+        elif proto == 'json' or proto == 'tjson':
+            return TJSONProtocol
+
+        raise ValueError('Unknown protocol: %s' % proto)
