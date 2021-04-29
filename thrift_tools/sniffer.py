@@ -225,13 +225,13 @@ class Sniffer(Thread):
                     time.sleep(0.1)
 
     def stop(self, wait_for_stopped=False):
-        if not self.isAlive():
+        if not self.is_alive():
             return
 
         self._wants_stop = True
 
         if wait_for_stopped:
-            while self.isAlive():
+            while self.is_alive():
                 time.sleep(0.01)
 
     def _handle_packet(self, packet):
