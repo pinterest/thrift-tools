@@ -73,16 +73,16 @@ class PrinterTestCase(unittest.TestCase):
         message_sniffer.join()
 
         self.assertIn(
-            'method       count          avg          min          max          p90          p95          p99         p999',
+            'method       count       avg       min       max       p90       p95       p99      p999',
             output.getvalue())
         self.assertIn(
-            'ping             1  0.000156164  0.000156164  0.000156164  0.000156164  0.000156164  0.000156164  0.000156164',
+            'ping             1  0.000156  0.000156  0.000156  0.000156  0.000156  0.000156  0.000156',
             output.getvalue())
         self.assertIn(
-            'calculate        1  0.000144005  0.000144005  0.000144005  0.000144005  0.000144005  0.000144005  0.000144005',
+            'calculate        1  0.000144  0.000144  0.000144  0.000144  0.000144  0.000144  0.000144',
             output.getvalue())
         self.assertIn(
-            'add              1  0.000103951  0.000103951  0.000103951  0.000103951  0.000103951  0.000103951  0.000103951',
+            'add              1  0.000104  0.000104  0.000104  0.000104  0.000104  0.000104  0.000104',
             output.getvalue())
 
     def _assertMessages(self, output):
