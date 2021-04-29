@@ -11,8 +11,6 @@ Received: method=ping, type=reply, seqid=0, header=None, fields=fields=[(string,
 
 """
 
-from __future__ import print_function
-
 import argparse
 import os
 import socket
