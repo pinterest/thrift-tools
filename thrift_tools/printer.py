@@ -36,7 +36,8 @@ def print_color(s, color_id, output=sys.stdout):
     output.flush()
 
 
-def print_msg(timestamp, src, dst, msg, format_opts,
+def print_msg(timestamp, src, dst, msg, 
+              ,
               prefix='', indent=0, output=sys.stdout,
               idl_function=None):
     timestr = fromtimestamp(timestamp).strftime('%H:%M:%S:%f')
@@ -91,6 +92,8 @@ def print_msg(timestamp, src, dst, msg, format_opts,
             prefix, timestr, src, dst, msg.method, msg.type, msg.seqid,
             header_line, fields_line)
 
+    outputstr = outputstr.decode('string-escape')
+        
     if format_opts.is_color:
         print_color(outputstr, src.__hash__())
     else:
