@@ -205,10 +205,11 @@ class IdlParser(object):
 
     def resolve_type(self, node_type):
         if isinstance(node_type, ast.Identifier):
-            resolved_type = self.types_by_name[node_type.value]
+            raw_type = node_type.value.split('.')[-1]
+            resolved_type = self.types_by_name[raw_type]
 
             if isinstance(resolved_type, TypeDef):
-                return self.resolve_type(resolved_type.node_type)
+                return self.resolve_type(resolved_type.type)
 
             return resolved_type
         if isinstance(node_type, ast.List):
