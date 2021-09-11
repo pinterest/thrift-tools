@@ -36,8 +36,7 @@ def print_color(s, color_id, output=sys.stdout):
     output.flush()
 
 
-def print_msg(timestamp, src, dst, msg, 
-              ,
+def print_msg(timestamp, src, dst, msg, format_opts,
               prefix='', indent=0, output=sys.stdout,
               idl_function=None):
     timestr = fromtimestamp(timestamp).strftime('%H:%M:%S:%f')
