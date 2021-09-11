@@ -91,6 +91,8 @@ def print_msg(timestamp, src, dst, msg, format_opts,
             prefix, timestr, src, dst, msg.method, msg.type, msg.seqid,
             header_line, fields_line)
 
+    outputstr = outputstr.decode('string-escape')
+        
     if format_opts.is_color:
         print_color(outputstr, src.__hash__())
     else:
