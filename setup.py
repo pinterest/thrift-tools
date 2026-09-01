@@ -53,7 +53,7 @@ setup(
           'dpkt==1.9.2',
           'ptsd==0.2.0',
           'scapy==2.4.5',
-          'thrift==0.11.0',
+          'thrift==0.24.0',
           'tabulate',
       ],
       tests_require=[
@@ -63,7 +63,7 @@ setup(
           'ptsd==0.2.0',
           'scapy==2.4.5',
           'six==1.12.0',
-          'thrift==0.11.0',
+          'thrift==0.24.0',
           'tabulate',
       ],
       extras_require={
@@ -74,7 +74,7 @@ setup(
               'ptsd==0.2.0',
               'scapy==2.4.5',
               'six==1.12.0',
-              'thrift==0.11.0',
+              'thrift==0.24.0',
               'tabulate',
               ],
       },
